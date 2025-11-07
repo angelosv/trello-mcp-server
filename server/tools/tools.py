@@ -3,6 +3,7 @@ This module contains tools for managing Trello boards, lists, and cards.
 """
 
 from server.tools import board, card, checklist, list
+from server.tools import smart_card, card_review
 
 
 def register_tools(mcp):
@@ -29,6 +30,16 @@ def register_tools(mcp):
     mcp.add_tool(card.add_label_to_card)
     mcp.add_tool(card.add_member_to_card)
     mcp.add_tool(card.delete_card)
+
+    # Smart Card Tools (análisis inteligente antes de crear tarjetas)
+    mcp.add_tool(smart_card.create_smart_card_from_commit)
+    mcp.add_tool(smart_card.create_smart_cards_from_recent_commits)
+    mcp.add_tool(smart_card.analyze_file_for_kotlin)
+    
+    # Card Review Tools (revisar y actualizar tarjetas existentes)
+    mcp.add_tool(card_review.review_cards_for_updates)
+    mcp.add_tool(card_review.get_available_members_for_assignment)
+    mcp.add_tool(card_review.suggest_members_for_commit)
 
     # Checklist Tools
     mcp.add_tool(checklist.get_checklist)
