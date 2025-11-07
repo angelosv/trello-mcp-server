@@ -61,8 +61,10 @@ class TrelloClient:
 
     async def PUT(self, endpoint: str, data: dict = None):
         all_params = {"key": self.api_key, "token": self.token}
+        if data:
+            all_params.update(data)
         try:
-            response = await self.client.put(endpoint, params=all_params, json=data)
+            response = await self.client.put(endpoint, params=all_params)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:

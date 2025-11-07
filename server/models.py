@@ -32,6 +32,15 @@ class TrelloLabel(BaseModel):
     color: str | None = None
 
 
+class TrelloMember(BaseModel):
+    """Model representing a Trello member."""
+    
+    id: str
+    username: str | None = None
+    fullName: str | None = None
+    initials: str | None = None
+
+
 class TrelloCard(BaseModel):
     """Model representing a Trello card."""
 

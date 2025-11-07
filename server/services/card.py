@@ -77,3 +77,37 @@ class CardService:
             Dict[str, Any]: The response from the delete operation.
         """
         return await self.client.DELETE(f"/cards/{card_id}")
+
+    async def add_label_to_card(self, card_id: str, label_id: str) -> Dict[str, Any]:
+        """Adds a label to a card.
+
+        Args:
+            card_id (str): The ID of the card.
+            label_id (str): The ID of the label to add.
+
+        Returns:
+            Dict[str, Any]: The response from the add operation.
+        """
+        # Trello API: POST /cards/{id}/idLabels with value parameter
+        response = await self.client.POST(
+            f"/cards/{card_id}/idLabels",
+            data={"value": label_id}
+        )
+        return response
+
+    async def add_member_to_card(self, card_id: str, member_id: str) -> Dict[str, Any]:
+        """Adds a member to a card.
+
+        Args:
+            card_id (str): The ID of the card.
+            member_id (str): The ID of the member to add.
+
+        Returns:
+            Dict[str, Any]: The response from the add operation.
+        """
+        # Trello API: PUT /cards/{id}/idMembers with idMembers parameter (comma-separated)
+        response = await self.client.PUT(
+            f"/cards/{card_id}/idMembers",
+            data={"idMembers": member_id}
+        )
+        return response
