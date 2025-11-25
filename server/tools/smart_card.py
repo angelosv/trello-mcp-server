@@ -3,6 +3,7 @@ Herramienta inteligente para crear tarjetas en Trello después de analizar códi
 """
 
 import logging
+import os
 from typing import List, Optional
 
 from mcp.server.fastmcp import Context
@@ -15,7 +16,8 @@ from server.utils.code_analyzer import (
     get_recent_commits_analysis,
     should_create_kotlin_task,
     is_relevant_for_kotlin,
-    analyze_file_changes
+    analyze_file_changes,
+    KOTLIN_SDK_PATH
 )
 from server.tools.card_review import (
     suggest_members_for_commit,
@@ -75,32 +77,109 @@ async def create_smart_card_from_commit(
             f"**Fecha:** {commit_data.get('date', 'unknown')}",
             "",
             f"**Mensaje:** {commit_data.get('message', 'Sin mensaje')}",
+        ]
+        
+        # Agregar cuerpo del mensaje si existe y es diferente del subject
+        message_body = commit_data.get('message_body', '').strip()
+        if message_body and message_body != commit_data.get('message', ''):
+            description_parts.append("")
+            description_parts.append("**Detalles del commit:**")
+            # Limitar a las primeras 10 líneas del cuerpo para no hacer la descripción muy larga
+            body_lines = message_body.split('\n')[:10]
+            for line in body_lines:
+                if line.strip():
+                    description_parts.append(f"- {line.strip()}")
+        
+        description_parts.extend([
             "",
             "**Archivos relevantes para Kotlin:**",
-        ]
+        ])
         
         for file_info in relevant_files:
             file_path = file_info['path']
             file_analysis = file_info.get('analysis', {})
             change_type = file_analysis.get('change_type', 'unknown')
             diff_summary = file_analysis.get('diff_summary', '')
+            code_changes = file_analysis.get('code_changes', {})
+            kotlin_check = file_analysis.get('kotlin_check', {})
             
             description_parts.append(f"- `{file_path}` ({change_type}, {diff_summary})")
+            
+            # Agregar análisis detallado de cambios en el código
+            if code_changes.get('description'):
+                for desc in code_changes['description']:
+                    description_parts.append(f"  - {desc}")
+            
+            # Agregar información sobre implementación en Kotlin
+            if kotlin_check:
+                kotlin_file = kotlin_check.get('kotlin_file_path')
+                if kotlin_file:
+                    # Obtener ruta relativa del archivo Kotlin
+                    from server.utils.code_analyzer import KOTLIN_SDK_PATH
+                    kotlin_rel_path = kotlin_file.replace(KOTLIN_SDK_PATH + '/', '') if KOTLIN_SDK_PATH in kotlin_file else os.path.basename(kotlin_file)
+                    description_parts.append(f"  - 📱 Archivo Kotlin: `{kotlin_rel_path}`")
+                
+                already_impl = kotlin_check.get('already_implemented', [])
+                missing_impl = kotlin_check.get('missing_implementation', [])
+                
+                if already_impl:
+                    description_parts.append(f"  - ✅ Ya implementado en Kotlin: {', '.join(already_impl[:3])}")
+                
+                if missing_impl:
+                    description_parts.append(f"  - ❌ Falta implementar en Kotlin: {', '.join(missing_impl[:3])}")
+                elif not kotlin_file:
+                    description_parts.append(f"  - ⚠️ Archivo equivalente no encontrado en Kotlin - necesita implementación completa")
+                
+                notes = kotlin_check.get('notes', [])
+                if notes:
+                    for note in notes[:2]:  # Limitar a 2 notas
+                        description_parts.append(f"  - ℹ️ {note}")
             
             # Agregar keywords relevantes si existen
             relevant_keywords = file_analysis.get('relevant_keywords', [])
             if relevant_keywords:
                 description_parts.append(f"  - Keywords: {', '.join(relevant_keywords)}")
         
+        # Generar resumen de cambios
+        total_added = sum(f.get('analysis', {}).get('added_lines', 0) for f in relevant_files)
+        total_removed = sum(f.get('analysis', {}).get('removed_lines', 0) for f in relevant_files)
+        
+        # Extraer todas las funciones/propiedades/clases modificadas
+        all_functions_added = []
+        all_properties_added = []
+        all_classes_added = []
+        
+        for file_info in relevant_files:
+            code_changes = file_info.get('analysis', {}).get('code_changes', {})
+            all_functions_added.extend(code_changes.get('functions_added', []))
+            all_properties_added.extend(code_changes.get('properties_added', []))
+            all_classes_added.extend(code_changes.get('classes_added', []))
+        
         description_parts.extend([
             "",
             "**Análisis:**",
             f"- Archivos relevantes: {len(relevant_files)}",
             f"- Archivos irrelevantes: {len(analysis.get('irrelevant_files', []))}",
+            f"- Líneas agregadas: {total_added}",
+            f"- Líneas eliminadas: {total_removed}",
+        ])
+        
+        # Agregar resumen de cambios si hay información detallada
+        if all_functions_added or all_properties_added or all_classes_added:
+            description_parts.append("")
+            description_parts.append("**Resumen de cambios:**")
+            if all_classes_added:
+                description_parts.append(f"- Clases/Structs agregados: {', '.join(list(set(all_classes_added))[:5])}")
+            if all_functions_added:
+                description_parts.append(f"- Funciones agregadas: {', '.join(list(set(all_functions_added))[:5])}")
+            if all_properties_added:
+                description_parts.append(f"- Propiedades agregadas: {', '.join(list(set(all_properties_added))[:5])}")
+        
+        description_parts.extend([
             "",
             "**Tareas sugeridas:**",
             "- [ ] Revisar cambios en código Swift",
-            "- [ ] Determinar impacto en SDK Kotlin",
+            "- [ ] Analizar impacto en SDK Kotlin",
             "- [ ] Implementar cambios equivalentes en Kotlin",
             "- [ ] Actualizar documentación si es necesario",
             "- [ ] Probar cambios en demo app",

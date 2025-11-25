@@ -111,3 +111,23 @@ class CardService:
             data={"idMembers": member_id}
         )
         return response
+
+    async def add_comment_to_card(self, card_id: str, text: str) -> Dict[str, Any]:
+        """Adds a comment to a card.
+
+        Args:
+            card_id (str): The ID of the card.
+            text (str): The comment text to add.
+
+        Returns:
+            Dict[str, Any]: The response from the add operation.
+        """
+        # Trello API: POST /cards/{id}/actions/comments with text parameter
+        # Trello requiere que text esté en los params, no en el body JSON
+        all_params = {"key": self.client.api_key, "token": self.client.token, "text": text}
+        response = await self.client.client.post(
+            f"/cards/{card_id}/actions/comments",
+            params=all_params
+        )
+        response.raise_for_status()
+        return response.json()
