@@ -11,8 +11,12 @@ def register_tools(mcp):
     # Board Tools
     mcp.add_tool(board.get_board)
     mcp.add_tool(board.get_boards)
+    mcp.add_tool(board.list_all_boards)
     mcp.add_tool(board.get_board_labels)
     mcp.add_tool(board.get_board_members)
+    mcp.add_tool(board.create_board)
+    mcp.add_tool(board.create_board_with_tasks)
+    mcp.add_tool(board.create_tasks_in_board)
     mcp.add_tool(board.create_board_label)
 
     # List Tools

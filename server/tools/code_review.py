@@ -27,7 +27,7 @@ SWIFT_SDK_PATH = "/Users/angelo/ReachuSwiftSDK"
 KOTLIN_GUIDE_PATH = "/Users/angelo/ReachuSwiftSDK/KOTLIN_IMPLEMENTATION_GUIDE.md"
 
 
-def extract_card_requirements(card: TrelloCard) -> Dict[str, any]:
+def extract_card_requirements(card: TrelloCard) -> dict:
     """
     Extrae los requisitos de la tarjeta analizando su descripción.
     
@@ -154,7 +154,7 @@ def find_kotlin_implementation_files(card: TrelloCard, kotlin_project_path: str)
     return files_found
 
 
-def analyze_kotlin_code(file_path: str, swift_reference_path: Optional[str] = None) -> Dict[str, any]:
+def analyze_kotlin_code(file_path: str, swift_reference_path: Optional[str] = None) -> dict:
     """
     Analiza un archivo Kotlin y compara con la referencia Swift si está disponible.
     
@@ -344,7 +344,7 @@ async def review_kotlin_implementation(
     kotlin_project_path: Optional[str] = None,
     board_id: Optional[str] = None,
     move_to_doing_if_issues: bool = True,
-) -> Dict[str, any]:
+) -> dict:
     """
     Revisa la implementación Kotlin de una tarjeta y agrega feedback como comentario.
     

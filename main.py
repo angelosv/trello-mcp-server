@@ -9,11 +9,18 @@ from starlette.routing import Mount
 
 from server.tools.tools import register_tools
 
-# Configure logging
+# Configure logging - write to both console and file
+log_file = os.path.join(os.path.dirname(__file__), "mcp_server.log")
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(log_file),
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
+logger.info(f"Logging to file: {log_file}")
 
 # Load environment variables
 load_dotenv()
