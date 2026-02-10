@@ -2,7 +2,7 @@
 Service for managing Trello cards in MCP server.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from server.models import TrelloCard
 from server.utils.trello_api import TrelloClient
@@ -131,3 +131,19 @@ class CardService:
         )
         response.raise_for_status()
         return response.json()
+
+    async def get_card_actions(self, card_id: str, filter_type: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Retrieves all actions (comments, updates, etc.) for a card.
+        
+        Args:
+            card_id: The ID of the card.
+            filter_type: Optional filter for action types (e.g., 'commentCard', 'updateCard')
+        
+        Returns:
+            List of action dictionaries
+        """
+        params = {}
+        if filter_type:
+            params['filter'] = filter_type
+        response = await self.client.GET(f'/cards/{card_id}/actions', params=params)
+        return response

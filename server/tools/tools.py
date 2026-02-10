@@ -64,3 +64,7 @@ def register_tools(mcp):
     mcp.add_tool(workflow.move_cards_by_priority)
     mcp.add_tool(workflow.update_card_description)
     mcp.add_tool(workflow.move_critical_cards_to_todo)
+    mcp.add_tool(workflow.get_backlog_cards_sorted_by_priority)
+    mcp.add_tool(workflow.move_backlog_to_todo_by_priority)
+    mcp.add_tool(workflow.analyze_developer_work_with_comments)
+    mcp.add_tool(workflow.get_list_cards_with_details)
