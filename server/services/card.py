@@ -95,6 +95,22 @@ class CardService:
         )
         return response
 
+    async def remove_label_from_card(self, card_id: str, label_id: str) -> Dict[str, Any]:
+        """Removes a label from a card.
+
+        Args:
+            card_id (str): The ID of the card.
+            label_id (str): The ID of the label to remove.
+
+        Returns:
+            Dict[str, Any]: The response from the remove operation.
+        """
+        # Trello API: DELETE /cards/{id}/idLabels/{idLabel}
+        response = await self.client.DELETE(
+            f"/cards/{card_id}/idLabels/{label_id}"
+        )
+        return response
+
     async def add_member_to_card(self, card_id: str, member_id: str) -> Dict[str, Any]:
         """Adds a member to a card.
 

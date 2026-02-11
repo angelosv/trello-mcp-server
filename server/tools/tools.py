@@ -32,6 +32,7 @@ def register_tools(mcp):
     mcp.add_tool(card.create_card)
     mcp.add_tool(card.update_card)
     mcp.add_tool(card.add_label_to_card)
+    mcp.add_tool(card.remove_label_from_card)
     mcp.add_tool(card.add_member_to_card)
     mcp.add_tool(card.delete_card)
 

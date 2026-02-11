@@ -84,6 +84,34 @@ python scripts/verify_cards.py \
 - ✅ Miembros asignados (mínimo 2)
 - ✅ Checklists creados con items
 
+### `remove_label_from_cards.py`
+
+Quita una etiqueta de una o más tarjetas de Trello. Útil para corregir asignaciones incorrectas (ej: quitar etiqueta vacía y usar la correcta como Kotlin).
+
+**Uso:**
+```bash
+# De tarjetas específicas
+python scripts/remove_label_from_cards.py \
+    --label-id <LABEL_ID> \
+    --card-ids <CARD_ID_1> <CARD_ID_2> ...
+
+# De todas las tarjetas de una lista
+python scripts/remove_label_from_cards.py \
+    --label-id <LABEL_ID> \
+    --list-id <LIST_ID>
+```
+
+**Ejemplo:**
+```bash
+python scripts/remove_label_from_cards.py \
+    --label-id 6964ea21570279f07def77f3 \
+    --list-id 6964ed62b23b70bbd5c89432
+```
+
+### `remove_green_label.py`
+
+Script específico para quitar la etiqueta vacía verde de las tarjetas Kotlin SDK. Ver `remove_label_from_cards.py` para uso genérico.
+
 ### `move_cards.py`
 
 Mueve tarjetas entre listas.

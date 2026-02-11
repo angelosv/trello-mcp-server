@@ -242,6 +242,28 @@ async def add_label_to_card(ctx: Context, card_id: str, label_id: str) -> dict:
         raise
 
 
+async def remove_label_from_card(ctx: Context, card_id: str, label_id: str) -> dict:
+    """Removes a label from a card.
+
+    Args:
+        card_id (str): The ID of the card.
+        label_id (str): The ID of the label to remove.
+
+    Returns:
+        dict: The response from the remove operation.
+    """
+    try:
+        logger.info(f"Removing label {label_id} from card {card_id}")
+        result = await service.remove_label_from_card(card_id, label_id)
+        logger.info(f"Successfully removed label from card: {card_id}")
+        return result
+    except Exception as e:
+        error_msg = f"Failed to remove label from card: {str(e)}"
+        logger.error(error_msg)
+        await ctx.error(error_msg)
+        raise
+
+
 async def add_member_to_card(ctx: Context, card_id: str, member_id: str) -> dict:
     """Adds a member to a card.
 
