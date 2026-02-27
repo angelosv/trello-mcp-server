@@ -1,0 +1,52 @@
+{
+    "6985f75601b379d47f292a75": {
+        "desc": "## Testing de las mejoras implementadas en Engagement System\n\n### Objetivo\nCrear tests unitarios y de integración para las nuevas funcionalidades implementadas en el sistema de Engagement.\n\n### Tareas\n\n#### Tests Unitarios\n- [ ] Test de `RequestRetryHandler` con exponential backoff\n- [ ] Test de `EngagementCache` con TTL y expiración\n- [ ] Test de `EngagementDataValidator` con datos válidos e inválidos\n- [ ] Test de `NetworkClient` protocol con mock\n- [ ] Test de manejo de errores mejorados\n\n#### Tests de Integración\n- [ ] Test de `BackendEngagementRepository` con retry en errores transitorios\n- [ ] Test de cache hit/miss scenarios\n- [ ] Test de invalidación de cache después de votos\n- [ ] Test de validación de datos del backend\n\n#### Archivos a crear\n- `Tests/ReachuEngagementSystemTests/RequestRetryHandlerTests.swift`\n- `Tests/ReachuEngagementSystemTests/EngagementCacheTests.swift`\n- `Tests/ReachuEngagementSystemTests/EngagementDataValidatorTests.swift`\n- `Tests/ReachuEngagementSystemTests/BackendEngagementRepositoryTests.swift`\n\n### Referencias\n- Branch: `feature/engagement-backend-improvements` (merged to main)\n- Changelog: `CHANGELOG_ENGAGEMENT_IMPROVEMENTS.md`\n- Archivos nuevos: `NetworkClient.swift`, `EngagementCache.swift`, `RequestRetryHandler.swift`, `EngagementMetrics.swift`, `EngagementDataValidator.swift`\n\n### Prioridad\nALTA - Necesario para validar que las mejoras funcionan correctamente",
+        "labels": ["testing", "swift", "sdk"],
+        "checklist": [
+            "Crear estructura de tests para RequestRetryHandler",
+            "Implementar tests de exponential backoff",
+            "Crear tests para EngagementCache con TTL",
+            "Implementar tests de validación de datos",
+            "Crear mocks de NetworkClient para testing",
+            "Implementar tests de integración para BackendEngagementRepository",
+            "Validar que cache funciona correctamente",
+            "Validar que retry funciona en errores transitorios"
+        ]
+    },
+    "6985f758865df376c0242f49": {
+        "desc": "## Actualización del Backend para API Key en Headers\n\n### Objetivo\nActualizar el backend para aceptar la API key en el header HTTP `X-API-Key` además de en query parameters (backward compatibility).\n\n### Cambios Requeridos\n\n#### Endpoints afectados\n- `GET /v1/engagement/polls`\n- `GET /v1/engagement/contests`\n- `POST /v1/engagement/polls/{pollId}/vote`\n- `POST /v1/engagement/contests/{contestId}/participate`\n\n#### Implementación\n1. **Middleware de autenticación**\n   - Verificar header `X-API-Key` primero\n   - Fallback a query parameter `apiKey` (backward compatibility)\n   - Validar API key contra base de datos\n\n2. **Logging**\n   - Remover API key de logs cuando viene en query params\n   - No loguear API key cuando viene en header (ya no aparece)\n\n3. **Documentación**\n   - Actualizar documentación de API\n   - Marcar query param como deprecated\n   - Recomendar uso de header\n\n### Prioridad\nMEDIA - Mejora de seguridad pero no bloqueante (backward compatible)\n\n### Referencias\n- SDK Swift ya implementado con header `X-API-Key`\n- Backward compatible: sigue funcionando con query params",
+        "labels": ["backend", "api", "security"],
+        "checklist": [
+            "Implementar middleware para leer X-API-Key header",
+            "Mantener soporte para query param apiKey (backward compat)",
+            "Actualizar validación de autenticación",
+            "Remover API key de logs cuando viene en query params",
+            "Actualizar documentación de API",
+            "Testing de ambos métodos (header y query param)"
+        ]
+    },
+    "6985f764ed6ed5c45d95c077": {
+        "desc": "## Monitoreo de Métricas de Engagement\n\n### Objetivo\nRevisar y analizar las métricas capturadas por `EngagementRequestMetrics` en el sistema de analytics.\n\n### Métricas a Monitorear\n\n#### Métricas Capturadas\n- Endpoint llamado (`/v1/engagement/polls`, `/v1/engagement/contests`, etc.)\n- Broadcast ID\n- Duración de request (ms)\n- Status code HTTP\n- Tamaño de respuesta (bytes)\n- Número de retries\n- Errores (si los hay)\n\n#### Dashboards a Crear\n1. **Performance Dashboard**\n   - Tiempo promedio de respuesta por endpoint\n   - P95/P99 latencia\n   - Throughput (requests/segundo)\n\n2. **Error Dashboard**\n   - Tasa de error por endpoint\n   - Tipos de errores más comunes\n   - Retry rate\n\n3. **Cache Effectiveness Dashboard**\n   - Cache hit rate\n   - Tiempo ahorrado por cache hits\n   - TTL effectiveness\n\n### Acciones\n- [ ] Configurar dashboard en Mixpanel/Analytics\n- [ ] Crear alertas para errores altos\n- [ ] Crear alertas para latencia alta\n- [ ] Revisar métricas semanalmente\n- [ ] Ajustar TTL de cache basado en métricas\n\n### Prioridad\nMEDIA - Importante para optimización pero no bloqueante\n\n### Referencias\n- `EngagementMetrics.swift` - Implementación de métricas\n- Integración con `AnalyticsManager`",
+        "labels": ["monitoring", "analytics", "performance"],
+        "checklist": [
+            "Configurar dashboard en Mixpanel para engagement metrics",
+            "Crear alertas para tasa de error > 5%",
+            "Crear alertas para latencia P95 > 2s",
+            "Revisar métricas de cache hit rate",
+            "Documentar métricas importantes",
+            "Establecer baseline de performance"
+        ]
+    },
+    "6985f76407e65cc885c91b89": {
+        "desc": "## Documentación de las Mejoras de Engagement\n\n### Objetivo\nDocumentar las mejoras implementadas en el sistema de Engagement para desarrolladores y usuarios del SDK.\n\n### Documentación Requerida\n\n#### Para Desarrolladores del SDK\n1. **Guía de Arquitectura**\n   - Explicar nuevos componentes (`NetworkClient`, `EngagementCache`, `RequestRetryHandler`)\n   - Diagramas de flujo de datos\n   - Patrones de diseño utilizados\n\n2. **Guía de Testing**\n   - Cómo crear mocks de `NetworkClient`\n   - Cómo testear retry logic\n   - Cómo testear cache\n\n3. **Guía de Migración**\n   - Cambios en `EngagementError` enum\n   - Nuevos métodos y propiedades\n   - Backward compatibility notes\n\n#### Para Usuarios del SDK\n1. **Release Notes**\n   - Nuevas funcionalidades\n   - Mejoras de performance\n   - Mejoras de seguridad\n\n2. **Best Practices**\n   - Cómo manejar errores mejorados\n   - Cómo monitorear métricas\n   - Configuración recomendada\n\n### Archivos a Crear/Actualizar\n- `Documentation/ENGAGEMENT_ARCHITECTURE.md`\n- `Documentation/ENGAGEMENT_TESTING.md`\n- `Documentation/ENGAGEMENT_MIGRATION.md`\n- `README.md` (actualizar sección de Engagement)\n- Release notes en GitHub\n\n### Prioridad\nBAJA - Documentación importante pero no bloqueante\n\n### Referencias\n- `CHANGELOG_ENGAGEMENT_IMPROVEMENTS.md`\n- Código fuente de las mejoras",
+        "labels": ["documentation", "sdk"],
+        "checklist": [
+            "Crear guía de arquitectura de Engagement",
+            "Documentar nuevos componentes y su uso",
+            "Crear guía de testing con ejemplos",
+            "Actualizar README con mejoras",
+            "Crear release notes para nueva versión",
+            "Documentar métricas disponibles"
+        ]
+    }
+}
